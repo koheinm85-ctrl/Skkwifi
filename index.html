@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKK_WIFI - Starlink Hotspot Vouchers</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Padauk) -->
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Padauk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-800 p-4 text-center">
+        <h1 class="text-2xl font-bold text-red-500">SKK_WIFI</h1>
+        <p class="text-sm text-gray-400">Starlink High-Speed Internet Access</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-md mx-auto p-4 w-full flex-grow">
+        
+        <!-- Pricing Packages -->
+        <h2 class="text-lg font-bold text-gray-200 mb-3 text-center">အသုံးပြုလိုသော ပက်ကေ့ချ် ရွေးချယ်ပါ</h2>
+        <div class="grid grid-cols-3 gap-2 mb-5">
+            <button type="button" onclick="selectPackage('1hr', 500, '1 နာရီ')" id="btn-1hr" class="pkg-btn bg-gray-900 border border-gray-700 hover:border-red-500 rounded-xl p-3 text-center active:bg-red-900/30 transition">
+                <span class="block text-xs text-gray-400">1 Hour</span>
+                <span class="block text-lg font-bold text-white mt-1">500 ကျပ်</span>
+            </button>
+            <button type="button" onclick="selectPackage('3hr', 1000, '3 နာရီ')" id="btn-3hr" class="pkg-btn bg-gray-900 border-2 border-red-500 rounded-xl p-3 text-center transition">
+                <span class="block text-xs text-red-400 font-semibold">3 Hours</span>
+                <span class="block text-lg font-bold text-white mt-1">1,000 ကျပ်</span>
+            </button>
+            <button type="button" onclick="selectPackage('1month', 35000, '1 လ')" id="btn-1month" class="pkg-btn bg-gray-900 border border-gray-700 hover:border-red-500 rounded-xl p-3 text-center transition">
+                <span class="block text-xs text-gray-400">1 Month</span>
+                <span class="block text-base font-bold text-white mt-1">35,000 ကျပ်</span>
+            </button>
+        </div>
+
+        <!-- Payment Info Card -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-lg mb-5 text-sm space-y-2">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <span class="text-gray-400">📶 Wi-Fi နာမည်:</span>
+                <strong class="text-white text-base">SKK_WIFI</strong>
+            </div>
+            <div class="flex justify-between items-center pt-1">
+                <span class="text-gray-400">💳 KPay ဖုန်းနံပါတ်:</span>
+                <strong class="text-red-400 text-base">09960000112</strong>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-gray-400">👤 အကောင့်နာမည်:</span>
+                <strong class="text-amber-400">Soe Wai</strong>
+            </div>
+        </div>
+
+        <!-- Payment & Verification Form -->
+        <div id="purchaseSection" class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-lg">
+            <h3 class="font-bold text-base mb-3 text-red-400 flex justify-between">
+                <span>ငွေပေးချေပြီး ကုဒ်ရယူရန်</span>
+                <span id="selectedPkgLabel" class="text-xs bg-red-500/20 text-red-300 px-2 py-0.5 rounded">3 နာရီ (1,000 ကျပ်)</span>
+            </h3>
+            <form id="voucherForm" onsubmit="generateVoucher(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">သင့်အမည် သို့မဟုတ် ဖုန်းနံပါတ်</label>
+                    <input type="text" id="buyerName" required class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-red-500" placeholder="ဥပမာ - ကိုအောင်">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">KPay လွှဲစဉ်နံပါတ် (Transaction ID နောက်ဆုံး 6 လုံး)</label>
+                    <input type="text" id="tranId" required maxlength="6" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-red-500" placeholder="ဥပမာ - 123456">
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md text-sm">
+                    ငွေလွှဲပြီးပါပြီ - Wi-Fi ကုဒ်ထုတ်ယူမည်
+                </button>
+            </form>
+        </div>
+
+        <!-- Secret Voucher Display Section (Hidden by default) -->
+        <div id="voucherResult" class="hidden bg-emerald-950/40 border border-emerald-500/50 rounded-xl p-5 shadow-lg text-center mt-4">
+            <h3 class="text-emerald-400 font-bold text-base mb-2">🎉 ငွေပေးချေမှု အောင်မြင်ပါသည်။</h3>
+            <p class="text-xs text-gray-300 mb-3">သင့်အတွက် သီးသန့် Starlink Wi-Fi ကုဒ်မှာ အောက်ပါအတိုင်း ဖြစ်ပါသည် -</p>
+            
+            <div class="bg-gray-900 border border-emerald-500/30 p-3 rounded-lg text-2xl font-mono font-bold text-emerald-300 tracking-wider mb-3 select-all" id="codeDisplay">
+                ------
+            </div>
+            
+            <p class="text-xs text-amber-400/90">⚠️ ဤကုဒ်ကို သင်တစ်ဦးတည်းသာ မြင်တွေ့ရပြီး အခြားသူများ ဝင်မကြည့်နိုင်ပါ။ စာမျက်နှာကို ပိတ်လိုက်ပါက ကုဒ်ပျောက်သွားနိုင်သဖြင့် ချက်ချင်း ချိတ်ဆက်အသုံးပြုပါ။</p>
+        </div>
+
+    </main>
+
+    <!-- Footer & Secret Owner Admin Trigger -->
+    <footer class="bg-gray-900 border-t border-gray-800 text-center py-4 text-xs text-gray-500 relative">
+        <p>&copy; 2026 SKK Mobile & IT. All rights reserved.</p>
+        <button onclick="openAdmin()" class="mt-2 text-gray-600 hover:text-gray-400 text-[10px] underline">
+            🔒 Admin Control Panel
+        </button>
+    </footer>
+
+    <!-- Owner Admin Modal (Hidden Secret Section) -->
+    <div id="adminModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-700 rounded-xl p-5 w-full max-w-lg max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-3">
+                <h3 class="text-base font-bold text-red-400">🛡️ ဆိုင်ရှင် (Owner Admin) ထိန်းချုပ်ခန်း</h3>
+                <button onclick="closeAdmin()" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-gray-800 mb-4 text-xs">
+                <button onclick="switchAdminTab('add')" id="tab-add" class="py-2 px-4 text-red-400 border-b-2 border-red-500 font-bold">ကုဒ်အသစ်များထည့်ရန်</button>
+                <button onclick="switchAdminTab('sales')" id="tab-sales" class="py-2 px-4 text-gray-400">အရောင်းစာရင်းကြည့်ရန်</button>
+            </div>
+
+            <!-- Tab 1: Add Codes -->
+            <div id="adminTabAdd" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">ပက်ကေ့ချ် အမျိုးအစား ရွေးပါ</label>
+                    <select id="adminPkgSelect" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white text-xs">
+                        <option value="1hr">1 Hour (500 ကျပ်)</option>
+                        <option value="3hr">3 Hours (1,000 ကျပ်)</option>
+                        <option value="1month">1 Month (35,000 ကျပ်)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Wi-Fi ကုဒ်များ ရိုက်ထည့်ပါ (တစ်ကြောင်းလျှင် ကုဒ်တစ်ခု)</label>
+                    <textarea id="adminCodesInput" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white font-mono text-xs" placeholder="SKK1H-ABCDE&#10;SKK1H-FGHIJ"></textarea>
+                </div>
+                <button onclick="saveCodesByOwner()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded text-xs">
+                    ကုဒ်များ သိမ်းဆည်းမည်
+                </button>
+                <div id="codeCounts" class="text-[11px] text-gray-400 pt-2 border-t border-gray-800 space-y-1">
+                    <!-- Dynamic Count Display -->
+                </div>
+            </div>
+
+            <!-- Tab 2: Sales Records -->
+            <div id="adminTabSales" class="hidden space-y-3">
+                <div id="salesList" class="space-y-2 text-xs">
+                    <p class="text-gray-400 text-center py-4">ဝယ်ယူထားသူ မရှိသေးပါ။</p>
+                </div>
+                <button onclick="clearSales()" class="bg-red-900/40 hover:bg-red-900 text-red-300 text-[11px] px-3 py-1.5 rounded mt-3">အရောင်းစာရင်း ရှင်းလင်းရန်</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let currentSelectedPkg = '3hr';
+
+        // Default initial codes if storage is empty
+        const defaultPools = {
+            '1hr': ["SKK1H-889A", "SKK1H-332B"],
+            '3hr': ["SKK3H-9X87Q", "SKK3H-4M21K"],
+            '1month': ["SKK1M-9001X"]
+        };
+
+        function getCodePools() {
+            let saved = localStorage.getItem('skk_code_pools');
+            return saved ? JSON.parse(saved) : defaultPools;
+        }
+
+        function selectPackage(pkg, price, label) {
+            currentSelectedPkg = pkg;
+            document.querySelectorAll('.pkg-btn').forEach(btn => {
+                btn.classList.remove('border-2', 'border-red-500');
+                btn.classList.add('border', 'border-gray-700');
+            });
+            let activeBtn = document.getElementById('btn-' + pkg);
+            activeBtn.classList.remove('border-gray-700');
+            activeBtn.classList.add('border-2', 'border-red-500');
+
+            document.getElementById('selectedPkgLabel').innerText = `${label} (${price.toLocaleString()} ကျပ်)`;
+        }
+
+        function generateVoucher(event) {
+            event.preventDefault();
+            const buyer = document.getElementById('buyerName').value;
+            const tran = document.getElementById('tranId').value;
+
+            if(!buyer || !tran) {
+                alert("အချက်အလက် အပြည့်အစုံ ဖြည့်ပါ။");
+                return;
+            }
+
+            let pools = getCodePools();
+            let availableList = pools[currentSelectedPkg] || [];
+
+            if (availableList.length === 0) {
+                alert("ယခု ပက်ကေ့ချ်အတွက် Wi-Fi ကုဒ် ကုန်နေပါပြီ။ ကျေးဇူးပြု၍ ဆိုင်ရှင်ထံ ဆက်သွယ်ပါခင်ဗျာ။");
+                return;
+            }
+
+            let existingCode = localStorage.getItem('skk_user_code');
+            let assignedCode = "";
+
+            if (existingCode) {
+                assignedCode = existingCode;
+            } else {
+                // Get the first code from pool and remove it
+                assignedCode = availableList.shift();
+                pools[currentSelectedPkg] = availableList;
+                localStorage.setItem('skk_code_pools', JSON.stringify(pools));
+
+                // Save User Session
+                localStorage.setItem('skk_user_code', assignedCode);
+
+                // Save Sales Log
+                let sales = JSON.parse(localStorage.getItem('skk_sales_records')) || [];
+                sales.push({
+                    name: buyer,
+                    tranId: tran,
+                    code: assignedCode,
+                    pkg: currentSelectedPkg,
+                    time: new Date().toLocaleTimeString()
+                });
+                localStorage.setItem('skk_sales_records', JSON.stringify(sales));
+            }
+
+            document.getElementById('codeDisplay').innerText = assignedCode;
+            document.getElementById('purchaseSection').classList.add('hidden');
+            document.getElementById('voucherResult').classList.remove('hidden');
+        }
+
+        window.onload = function() {
+            let savedCode = localStorage.getItem('skk_user_code');
+            if (savedCode) {
+                document.getElementById('purchaseSection').classList.add('hidden');
+                document.getElementById('voucherResult').classList.remove('hidden');
+                document.getElementById('codeDisplay').innerText = savedCode;
+            }
+        }
+
+        // Owner Admin Modal Functions
+        function openAdmin() {
+            let pwd = prompt("Owner Admin စကားဝှက် ထည့်ပါ:");
+            if (pwd === "1234") { // Default Owner Password
+                updateCodeCountsUI();
+                document.getElementById('adminModal').classList.remove('hidden');
+            } else if (pwd !== null) {
+                alert("စကားဝှက် မှားယွင်းနေပါသည်။");
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            if(tab === 'add') {
+                document.getElementById('adminTabAdd').classList.remove('hidden');
+                document.getElementById('adminTabSales').classList.add('hidden');
+                document.getElementById('tab-add').className = "py-2 px-4 text-red-400 border-b-2 border-red-500 font-bold";
+                document.getElementById('tab-sales').className = "py-2 px-4 text-gray-400";
+            } else {
+                document.getElementById('adminTabAdd').classList.add('hidden');
+                document.getElementById('adminTabSales').classList.remove('hidden');
+                document.getElementById('tab-add').className = "py-2 px-4 text-gray-400";
+                document.getElementById('tab-sales').className = "py-2 px-4 text-red-400 border-b-2 border-red-500 font-bold";
+                renderSalesUI();
+            }
+        }
+
+        function saveCodesByOwner() {
+            let pkg = document.getElementById('adminPkgSelect').value;
+            let rawText = document.getElementById('adminCodesInput').value.trim();
+            
+            if(!rawText) {
+                alert("ကုဒ်များကို ရိုက်ထည့်ပေးပါ။");
+                return;
+            }
+
+            let newCodes = rawText.split('\n').map(c => c.trim()).filter(c => c.length > 0);
+            let pools = getCodePools();
+            
+            pools[pkg] = (pools[pkg] || []).concat(newCodes);
+            localStorage.setItem('skk_code_pools', JSON.stringify(pools));
+
+            document.getElementById('adminCodesInput').value = "";
+            alert("ကုဒ်အသစ်များ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+            updateCodeCountsUI();
+        }
+
+        function updateCodeCountsUI() {
+            let pools = getCodePools();
+            document.getElementById('codeCounts').innerHTML = `
+                <p>📦 လက်ကျန် 1hr ကုဒ်: <strong class="text-white">${(pools['1hr'] || []).length}</strong> ခု</p>
+                <p>📦 လက်ကျန် 3hr ကုဒ်: <strong class="text-white">${(pools['3hr'] || []).length}</strong> ခု</p>
+                <p>📦 လက်ကျန် 1month ကုဒ်: <strong class="text-white">${(pools['1month'] || []).length}</strong> ခု</p>
+            `;
+        }
+
+        function renderSalesUI() {
+            let sales = JSON.parse(localStorage.getItem('skk_sales_records')) || [];
+            let container = document.getElementById('salesList');
+
+            if(sales.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-center py-4">အရောင်းစာရင်း မရှိသေးပါ။</p>`;
+                return;
+            }
+
+            let html = `<table class="w-full text-left border-collapse">
+                <tr class="border-b border-gray-800 text-gray-400">
+                    <th class="p-1">အမည်</th>
+                    <th class="p-1">KPay ID</th>
+                    <th class="p-1">ထုတ်ပေးခဲ့သော ကုဒ်</th>
+                </tr>`;
+            
+            sales.forEach(s => {
+                html += `<tr class="border-b border-gray-800/50">
+                    <td class="p-1 text-white">${s.name}</td>
+                    <td class="p-1 text-red-400">${s.tranId}</td>
+                    <td class="p-1 font-mono text-emerald-300">${s.code}</td>
+                </tr>`;
+            });
+            html += `</table>`;
+            container.innerHTML = html;
+        }
+
+        function clearSales() {
+            if(confirm("အရောင်းစာရင်းအားလုံးကို ဖျက်ရန် သေချာပါသလား?")) {
+                localStorage.removeItem('skk_sales_records');
+                renderSalesUI();
+            }
+        }
+    </script>
+</body>
+</html>
